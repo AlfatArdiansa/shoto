@@ -1,6 +1,7 @@
 import Elysia, { status, t } from "elysia";
 import { addLink, generateSlug, getLink, getUrl } from "./service";
 import { env } from "@/lib/env";
+import { getBaseURL } from "@/action/env";
 
 const linkRoutes = new Elysia({ prefix: "/link" })
   .get(
@@ -28,7 +29,7 @@ const linkRoutes = new Elysia({ prefix: "/link" })
       if (urlExists) {
         return status(200, {
           slug: urlExists.slug,
-          shortUrl: `${env.BASE_URL}/${urlExists.slug}`,
+          shortUrl: `${await getBaseURL()}/${urlExists.slug}`,
           url,
         });
       }
@@ -38,7 +39,7 @@ const linkRoutes = new Elysia({ prefix: "/link" })
 
       return status(201, {
         slug,
-        shortUrl: `${env.BASE_URL}/${slug}`,
+        shortUrl: `${await getBaseURL()}/${slug}`,
         url: body.url,
       });
     },
