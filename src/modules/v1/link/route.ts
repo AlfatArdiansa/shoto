@@ -1,5 +1,6 @@
 import Elysia, { t } from "elysia";
 import { addLink, generateSlug, getLink } from "./service";
+import { APIError, APIResponse } from "@/lib/http-helper";
 
 const linkRoutes = new Elysia({ prefix: "/link" })
   .get(
@@ -7,14 +8,9 @@ const linkRoutes = new Elysia({ prefix: "/link" })
     async ({ query }) => {
       const linkData = await getLink(query.slug);
 
-      if (linkData)
-        return new Response(null, {
-          status: 301,
-          headers: {
-            "Cache-Control": "no-cache, no-store, must-revalidate",
-            Location: linkData.url,
-          },
-        });
+      if (!linkData) throw new Error("Link not found");
+
+      return linkData;
     },
     {
       query: t.Object({
@@ -25,8 +21,9 @@ const linkRoutes = new Elysia({ prefix: "/link" })
   .post(
     "/",
     async ({ body }) => {
-      const slug = generateSlug();
+      const slug = await generateSlug();
       await addLink(slug, body.url);
+
       return { slug };
     },
     {

@@ -1,6 +1,8 @@
+"use server";
+
 import { db } from "@/lib/database";
 
-export const generateSlug = (length: number = 6) => {
+export const generateSlug = async (length: number = 6) => {
   const chars =
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   let slug = "";
@@ -17,7 +19,7 @@ export const addLink = async (slug: string, url: string) => {
 };
 
 export const getLink = async (slug: string) => {
-  const stmt = db.query("SELECT * FROM link WHERE slug = ?");
+  const stmt = db.query("SELECT id, slug, url FROM link WHERE slug = ?");
   return stmt.get(slug) as {
     id: number;
     slug: string;
