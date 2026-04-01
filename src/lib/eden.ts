@@ -1,5 +1,5 @@
 import { treaty } from "@elysiajs/eden";
-import { apiRoutes } from "@/modules/v1/route";
+import { apiRoutes } from "@/app/api/[[...slugs]]/route";
 import { getBaseURL } from "@/action/env";
 
 // .api to enter /api prefix
