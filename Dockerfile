@@ -1,58 +1,51 @@
 # Use the official Bun image
-FROM oven/bun:1.2.4-alpine AS base
+FROM oven/bun:1.3.5-alpine AS base
 
-# Install dependencies only when needed
 FROM base AS deps
 WORKDIR /app
 
-# Install dependencies based on the lockfile
 COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 
-# Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Next.js collects completely anonymous telemetry data about general usage.
-# Learn more here: https://nextjs.org/telemetry
-# Uncomment the following line in case you want to disable telemetry during the build.
-# ENV NEXT_TELEMETRY_DISABLED 1
+ENV NEXT_TELEMETRY_DISABLED=1
 
-RUN bun run build
+RUN bun --bun run build
 
-# Production image, copy all the files and run next
 FROM base AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
-# Uncomment the following line in case you want to disable telemetry during runtime.
-# ENV NEXT_TELEMETRY_DISABLED 1
+ENV NEXT_TELEMETRY_DISABLED=1
 
-# Create a non-root user for security
-# addgroup and adduser syntax for alpine
-RUN addgroup -S -G 1001 nodejs
+RUN addgroup -S -g 1001 nodejs
 RUN adduser -S -u 1001 -G nodejs nextjs
 
-# Set the correct permission for prerender cache
 RUN mkdir .next
+RUN mkdir data
 RUN chown nextjs:nodejs .next
+RUN chown nextjs:nodejs data
+
+RUN chown nextjs:nodejs /app
 
 # Automatically leverage output traces to reduce image size
 # https://nextjs.org/docs/advanced-features/output-file-tracing
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+COPY --chown=nextjs:nodejs entrypoint.sh ./
+
+RUN chmod 755 /app/entrypoint.sh
 
 USER nextjs
 
 EXPOSE 3000
 
 ENV PORT=3000
-# set hostname to localhost
 ENV HOSTNAME="0.0.0.0"
 
-# server.js is created by next build from the standalone output
-# https://nextjs.org/docs/pages/api-reference/next-config-js/output
-CMD ["bun", "server.js"]
+ENTRYPOINT [ "/bin/ash", "/app/entrypoint.sh" ]

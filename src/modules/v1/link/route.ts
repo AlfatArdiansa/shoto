@@ -1,6 +1,6 @@
-import Elysia, { t } from "elysia";
-import { addLink, generateSlug, getLink } from "./service";
-import { APIError, APIResponse } from "@/lib/http-helper";
+import Elysia, { status, t } from "elysia";
+import { addLink, generateSlug, getLink, getUrl } from "./service";
+import { env } from "@/lib/env";
 
 const linkRoutes = new Elysia({ prefix: "/link" })
   .get(
@@ -21,10 +21,26 @@ const linkRoutes = new Elysia({ prefix: "/link" })
   .post(
     "/",
     async ({ body }) => {
+      const { url } = body;
+
+      const urlExists = await getUrl(url);
+
+      if (urlExists) {
+        return status(200, {
+          slug: urlExists.slug,
+          shortUrl: `${env.BASE_URL}/${urlExists.slug}`,
+          url,
+        });
+      }
+
       const slug = await generateSlug();
       await addLink(slug, body.url);
 
-      return { slug };
+      return status(201, {
+        slug,
+        shortUrl: `${env.BASE_URL}/${slug}`,
+        url: body.url,
+      });
     },
     {
       body: t.Object({
