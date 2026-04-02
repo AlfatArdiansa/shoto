@@ -1,13 +1,14 @@
-import { existsSync, mkdirSync } from "node:fs";
+import { ConfigHelper } from "./helper/config";
 import { DatabaseHelper } from "./helper/database";
-import { EnvHelper } from "./helper/env";
-import { env } from "./lib/env";
 
 export async function register() {
   if (process.env.NEXT_RUNTIME === "nodejs") {
-    if (!existsSync("./data")) mkdirSync("./data");
-    await EnvHelper.createEnvFile();
+    const { existsSync, mkdirSync } = await import("node:fs");
+
+    if (!existsSync("./data")) {
+      mkdirSync("./data");
+    }
+    await ConfigHelper.createConfigFile();
     await DatabaseHelper.initiateDatabase();
-    console.log("ENV", env);
   }
 }
