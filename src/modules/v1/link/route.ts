@@ -1,7 +1,6 @@
 import Elysia, { status, t } from "elysia";
 import { addLink, generateSlug, getLink, getUrl } from "./service";
-import { env } from "@/lib/env";
-import { getBaseURL } from "@/action/env";
+import { getBaseURL } from "@/action/config";
 
 const linkRoutes = new Elysia({ prefix: "/link" })
   .get(
