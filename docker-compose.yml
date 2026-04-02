@@ -1,0 +1,10 @@
+services:
+  shoto:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: shoto
+    ports:
+      - 3000:3000
+    volumes:
+      - ./data:/app/data
