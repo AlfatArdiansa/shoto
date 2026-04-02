@@ -1,6 +1,6 @@
 "use client";
 
-import { api } from "@/lib/eden";
+import { initiateAPI } from "@/lib/eden";
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 
@@ -19,7 +19,9 @@ export const Redirector = ({ slug }: { slug: string }) => {
   const [linkData, setLinkData] = useState<any>(null);
 
   const fetchData = async () => {
-    const linkData = await api.v1.link.get({ query: { slug: slug } });
+    const linkData = await initiateAPI(window.location.origin).v1.link.get({
+      query: { slug: slug },
+    });
 
     if (linkData.status === 200) {
       setLinkData(linkData.data);
