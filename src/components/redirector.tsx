@@ -3,6 +3,7 @@
 import { initiateAPI } from "@/lib/eden";
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
+import { useRouter } from "next/navigation";
 
 enum Status {
   idle = "idle",
@@ -12,6 +13,8 @@ enum Status {
 }
 
 export const Redirector = ({ slug }: { slug: string }) => {
+  const router = useRouter();
+
   const [countDown, setCountDown] = useState(5);
 
   const [status, setStatus] = useState<Status>(Status.idle);
@@ -36,7 +39,7 @@ export const Redirector = ({ slug }: { slug: string }) => {
   useEffect(() => {
     setStatus(Status.fetching);
 
-    fetchData();
+    void fetchData();
   }, []);
 
   useEffect(() => {
@@ -48,12 +51,14 @@ export const Redirector = ({ slug }: { slug: string }) => {
       }
 
       if (countDown === 0) {
-        window.location.href = linkData.url;
+        router.push(linkData.url);
         clearInterval(countDownInterval);
       }
     }, 1000);
 
-    return () => clearInterval(countDownInterval);
+    return () => {
+      clearInterval(countDownInterval);
+    };
   }, [status, countDown]);
 
   return (
@@ -76,7 +81,9 @@ export const Redirector = ({ slug }: { slug: string }) => {
         {status === Status.redirecting && (
           <Button
             className="w-full mt-4"
-            onClick={() => (window.location.href = linkData.url)}
+            onClick={() => {
+              router.push(linkData.url);
+            }}
           >
             If you are not redirected, click here
           </Button>

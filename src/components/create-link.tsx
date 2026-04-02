@@ -52,10 +52,8 @@ export const CreateLink: React.FC = () => {
                 className="hover:cursor-pointer"
                 align="inline-end"
                 onClick={async () => {
-                  if (inputRef) {
-                    inputRef.current?.select();
-                    await navigator.clipboard.writeText(createdLink);
-                  }
+                  inputRef.current?.select();
+                  await navigator.clipboard.writeText(createdLink);
                 }}
               >
                 <Copy />
