@@ -19,7 +19,11 @@ export const Redirector = ({ slug }: { slug: string }) => {
 
   const [status, setStatus] = useState<Status>(Status.idle);
 
-  const [linkData, setLinkData] = useState<any>(null);
+  const [linkData, setLinkData] = useState<{
+    id: number;
+    slug: string;
+    url: string;
+  } | null>(null);
 
   const fetchData = async () => {
     const linkData = await initiateAPI(window.location.origin).v1.link.get({
@@ -51,7 +55,7 @@ export const Redirector = ({ slug }: { slug: string }) => {
       }
 
       if (countDown === 0) {
-        router.push(linkData.url);
+        if (linkData) router.push(linkData.url);
         clearInterval(countDownInterval);
       }
     }, 1000);
@@ -82,7 +86,7 @@ export const Redirector = ({ slug }: { slug: string }) => {
           <Button
             className="w-full mt-4"
             onClick={() => {
-              router.push(linkData.url);
+              if (linkData) router.push(linkData.url);
             }}
           >
             If you are not redirected, click here
