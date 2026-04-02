@@ -29,7 +29,7 @@ const linkRoutes = new Elysia({ prefix: "/link" })
         return status(200, {
           slug: urlExists.slug,
           shortUrl: `${await getBaseURL()}/${urlExists.slug}`,
-          url,
+          url: urlExists.url,
         });
       }
 
@@ -39,7 +39,7 @@ const linkRoutes = new Elysia({ prefix: "/link" })
       return status(201, {
         slug,
         shortUrl: `${await getBaseURL()}/${slug}`,
-        url: body.url,
+        url: url.endsWith("/") ? url.slice(0, -1) : url,
       });
     },
     {
